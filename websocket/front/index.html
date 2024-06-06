@@ -3,18 +3,46 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Rock, Paper, Scissors</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <p>last message</p>
-    <p class="data"></p>
-    <p>room</p>
-    <textarea name="" id="room"></textarea>
-    <p>message</p>
-    <textarea name="" id="message"></textarea>
-    <button onclick="send()">send</button>
-
+    <div class="container">
+        <div class="header">
+            <h1>Pierre, Papier, Ciseaux</h1>
+            <div class="players">
+                <div id="player1" class="player">
+                    <span id="player1-name">Player 1</span>
+                    <span id="player1-score">0</span>
+                </div>
+                <div id="player2" class="player">
+                    <span id="player2-name">Player 2</span>
+                    <span id="player2-score">0</span>
+                </div>
+            </div>
+        </div>
+        <div id="join-room" class="join-room">
+            <h2>Join Room</h2>
+            <p>Room</p>
+            <textarea id="room"></textarea>
+            <p>Pseudo</p>
+            <textarea id="pseudo"></textarea>
+            <button id="joinButton" onclick="joinRoom()">Join Room</button>
+            <button id="leaveButton" onclick="leaveRoom()" style="display:none;">Leave Room</button>
+        </div>
+        <div id="game" class="game" style="display:none;">
+            <div id="score-board" class="score-board"></div>
+            <div class="rps-buttons">
+                <button onclick="choose('rock')" class="rps-button">Rock</button>
+                <button onclick="choose('paper')" class="rps-button">Paper</button>
+                <button onclick="choose('scissors')" class="rps-button">Scissors</button>
+            </div>
+            <p id="waiting-message" class="waiting-message"></p>
+            <p id="game-result" class="game-result"></p>
+            <button id="replay" onclick="replay()" style="display:none;">Replay</button>
+        </div>
+    </div>
+    <script src="https://cdn.socket.io/4.7.5/socket.io.min.js" integrity="sha384-2huaZvOR9iDzHqslqwpR87isEmrfxqyWOF7hr7BY6KG0+hVKLoEXMPUJw3ynWuhO" crossorigin="anonymous"></script>
+    <script src="script.js"></script>
 </body>
-<script src="https://cdn.socket.io/4.7.5/socket.io.min.js" integrity="sha384-2huaZvOR9iDzHqslqwpR87isEmrfxqyWOF7hr7BY6KG0+hVKLoEXMPUJw3ynWuhO" crossorigin="anonymous"></script>
-<script src="./script.js"></script>
 </html>
