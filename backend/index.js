@@ -39,12 +39,42 @@ io.on('connection', (socket) => {
     console.log('a user connected');
     socket.broadcast.emit('user connected');
 
+    // Envoyer la liste des salles disponibles au client
+    socket.emit('room_list', getRoomList());
+
     socket.on('disconnect', () => {
         console.log('user disconnected');
         handlePlayerLeave(socket);
     });
 
-    socket.on('join', (room, pseudo, rounds) => {
+    socket.on('create_room', (room, pseudo, rounds) => {
+        if (rooms[room]) {
+            socket.emit('error_message', 'La room que vous essayez de créer est déjà existante');
+            return;
+        }
+
+        console.log(`${pseudo} created room: ${room}`);
+        socket.join(room);
+
+        rooms[room] = [];
+        players[room] = {};
+        scores[room] = {};
+        pseudos[room] = {};
+        roundsToWin[room] = rounds;
+
+        scores[room][socket.id] = 0;
+        pseudos[room][socket.id] = pseudo;
+
+        players[room][socket.id] = null;
+        io.emit('room_list', getRoomList()); // Mettre à jour la liste des salles pour tous les clients
+        io.to(room).emit('join', { room, pseudo });
+
+        if (Object.keys(players[room]).length === 2) {
+            io.to(room).emit('start_game', pseudos[room]);
+        }
+    });
+
+    socket.on('join', (room, pseudo) => {
         console.log(`${pseudo} joined room: ${room}`);
         socket.join(room);
 
@@ -60,7 +90,6 @@ io.on('connection', (socket) => {
         if (!pseudos[room]) {
             pseudos[room] = {};
         }
-        roundsToWin[room] = rounds;
 
         scores[room][socket.id] = 0;
         pseudos[room][socket.id] = pseudo;
@@ -140,6 +169,29 @@ io.on('connection', (socket) => {
         io.to(room).emit('message', data);
     });
 
+    socket.on('delete_room', (room) => {
+        console.log(`Room ${room} deleted`);
+        if (rooms[room]) {
+            // Inform all users in the room that it is being deleted
+            io.to(room).emit('room_deleted', `Room ${room} has been deleted`);
+            
+            // Remove all players from the room
+            for (const socketId in players[room]) {
+                handlePlayerLeave({ id: socketId }, room);
+            }
+            
+            // Delete room data
+            delete rooms[room];
+            delete players[room];
+            delete scores[room];
+            delete pseudos[room];
+            delete roundsToWin[room];
+
+            // Update the room list for all clients
+            io.emit('room_list', getRoomList());
+        }
+    });
+
     const handlePlayerLeave = (socket, room = null) => {
         for (const r in players) {
             if (room && room !== r) continue;
@@ -150,6 +202,14 @@ io.on('connection', (socket) => {
                 delete pseudos[r][socket.id];
                 io.to(r).emit('user disconnected', socket.id);
                 io.to(r).emit('stop_game', `Le joueur ${pseudo} a quitté`);
+                if (Object.keys(players[r]).length === 0) {
+                    delete rooms[r];
+                    delete players[r];
+                    delete scores[r];
+                    delete pseudos[r];
+                    delete roundsToWin[r];
+                }
+                io.emit('room_list', getRoomList()); // Mettre à jour la liste des salles pour tous les clients
             }
         }
     };
@@ -174,6 +234,14 @@ const resetGame = (room, resetScores = false) => {
         }
     }
     io.to(room).emit('reset_game');
+};
+
+const getRoomList = () => {
+    const roomList = [];
+    for (const room in rooms) {
+        roomList.push({ room, rounds: roundsToWin[room] });
+    }
+    return roomList;
 };
 
 server.listen(PORT, () => {

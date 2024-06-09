@@ -35,8 +35,20 @@
                     <option value="5">5</option>
                 </select>
             </div>
-            <button id="joinButton" onclick="joinRoom()">Join Room</button>
+            <button id="joinButton" onclick="createRoom()">Créer Room</button>
             <button id="leaveButton" onclick="leaveRoom()" style="display:none;">Leave Room</button>
+        </div>
+        <div id="room-info" class="room-info" style="display:none;">
+            <h2>Room Information</h2>
+            <p id="room-name"></p>
+            <p id="rounds-chosen"></p>
+        </div>
+        <button id="show-rooms-button" onclick="toggleRoomList()">Show Available Rooms</button>
+        <div id="room-list" class="room-list" style="display:none;">
+            <h2>Available Rooms</h2>
+            <div id="room-list-container" class="room-list-container">
+                <!-- Les informations des salles seront ajoutées ici -->
+            </div>
         </div>
         <div id="game" class="game" style="display:none;">
             <div id="score-board" class="score-board"></div>
@@ -48,6 +60,7 @@
             <p id="waiting-message" class="waiting-message"></p>
             <p id="game-result" class="game-result"></p>
             <button id="replay" onclick="replay()" style="display:none;">Replay</button>
+            <button id="leaveRoomButton" onclick="leaveRoom()" style="display:none;">Leave Room</button>
         </div>
         <div id="final-score-container" class="final-score-container" style="display:none;">
             <div id="final-score-board" class="final-score-board"></div>

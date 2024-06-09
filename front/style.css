@@ -49,7 +49,7 @@ h1 {
     align-items: center;
 }
 
-.join-room, .game {
+.join-room, .game, .room-list {
     text-align: center;
     width: 100%;
 }
@@ -180,4 +180,37 @@ button:hover {
     margin: 20px auto; /* Centrer le bouton et ajouter un espace autour */
     padding: 15px 30px; /* Rendre le bouton plus grand */
     font-size: 18px; /* Augmenter la taille du texte */
+}
+
+.room-info {
+    width: 80%;
+    max-width: 600px;
+    background: #282828;
+    padding: 20px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    border-radius: 8px;
+    text-align: center;
+    margin-top: 20px;
+}
+
+.room-list {
+    width: 100%;
+    margin-top: 20px;
+}
+
+.room-list-container {
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.room-item {
+    background: #3a3a3a;
+    padding: 10px;
+    margin: 10px 0;
+    border-radius: 4px;
+    text-align: left;
+}
+
+.room-item button {
+    margin-top: 10px;
 }
