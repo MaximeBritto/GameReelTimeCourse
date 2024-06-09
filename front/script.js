@@ -1,11 +1,12 @@
 const socket = io('https://gamereeltimecourse.onrender.com');
 let room = '';
 let pseudo = '';
+let roundsToWin = 3;
 
 socket.on('connect', () => {
     console.log('Connected');
     if (room && pseudo) {
-        socket.emit('join', room, pseudo);
+        socket.emit('join', room, pseudo, roundsToWin);
     }
 });
 
@@ -23,6 +24,7 @@ socket.on('start_game', (pseudos) => {
     document.querySelector('#game-result').innerText = 'Game started! Make your choice.';
     document.querySelector('#waiting-message').innerText = ''; // Clear waiting message
     document.querySelector('#replay').style.display = 'none';
+    document.querySelector('#final-score-container').style.display = 'none';
     updatePlayerNames(pseudos);
     updateScoreBoard({ [pseudos[Object.keys(pseudos)[0]]]: 0, [pseudos[Object.keys(pseudos)[1]]]: 0 });
 });
@@ -38,7 +40,10 @@ socket.on('game_end', (result) => {
     document.querySelector('#replay').style.display = 'block';
     if (result === 'Gagné') {
         launchFireworks();
+    } else {
+        startRain();
     }
+    displayFinalScoreBoard();
 });
 
 socket.on('waiting', (message) => {
@@ -65,8 +70,9 @@ socket.on('stop_game', (message) => {
 function joinRoom() {
     room = document.querySelector('#room').value;
     pseudo = document.querySelector('#pseudo').value;
+    roundsToWin = parseInt(document.querySelector('#roundsToWin').value);
     if (room && pseudo) {
-        socket.emit('join', room, pseudo);
+        socket.emit('join', room, pseudo, roundsToWin);
         document.querySelector('#joinButton').style.display = 'none';
         document.querySelector('#leaveButton').style.display = 'block';
     } else {
@@ -85,7 +91,7 @@ function choose(choice) {
 }
 
 function replay() {
-    socket.emit('reset_game', room);
+    socket.emit('reset_game', room, roundsToWin);
 }
 
 function resetUI() {
@@ -100,8 +106,10 @@ function resetUI() {
     document.querySelector('#player1-score').innerText = '0';
     document.querySelector('#player2-name').innerText = 'Player 2';
     document.querySelector('#player2-score').innerText = '0';
+    document.querySelector('#final-score-container').style.display = 'none';
     room = '';
     pseudo = '';
+    roundsToWin = 3;
 }
 
 function updatePlayerNames(pseudos) {
@@ -117,6 +125,22 @@ const updateScoreBoard = (scores) => {
     document.querySelector('#player2-score').innerText = scores[player2Name] || 0;
 };
 
+const displayFinalScoreBoard = () => {
+    const finalScoreContainer = document.querySelector('#final-score-container');
+    const finalScoreBoard = document.querySelector('#final-score-board');
+    const player1Name = document.querySelector('#player1-name').innerText;
+    const player2Name = document.querySelector('#player2-name').innerText;
+    const player1Score = document.querySelector('#player1-score').innerText;
+    const player2Score = document.querySelector('#player2-score').innerText;
+
+    finalScoreBoard.innerHTML = `
+        <h2>Final Score</h2>
+        <p>${player1Name}: ${player1Score}</p>
+        <p>${player2Name}: ${player2Score}</p>
+    `;
+    finalScoreContainer.style.display = 'block';
+};
+
 // Fireworks animation
 function launchFireworks() {
     const canvas = document.getElementById('fireworksCanvas');
@@ -128,14 +152,17 @@ function launchFireworks() {
 
     function createFirework(x, y) {
         const particles = [];
+        const colors = ['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff', '#00ffff', '#ffffff'];
         for (let i = 0; i < 100; i++) {
+            const color = colors[Math.floor(Math.random() * colors.length)];
             particles.push({
                 x: x,
                 y: y,
                 angle: Math.random() * 2 * Math.PI,
                 speed: Math.random() * 5 + 1,
                 radius: Math.random() * 2 + 1,
-                opacity: 1
+                opacity: 1,
+                color: color
             });
         }
         fireworks.push(particles);
@@ -167,7 +194,7 @@ function launchFireworks() {
             for (const p of particles) {
                 ctx.beginPath();
                 ctx.arc(p.x, p.y, p.radius, 0, 2 * Math.PI);
-                ctx.fillStyle = `rgba(255, 255, 255, ${p.opacity})`;
+                ctx.fillStyle = `rgba(${parseInt(p.color.slice(1, 3), 16)}, ${parseInt(p.color.slice(3, 5), 16)}, ${parseInt(p.color.slice(5, 7), 16)}, ${p.opacity})`;
                 ctx.fill();
             }
         }
@@ -176,16 +203,81 @@ function launchFireworks() {
     function animate() {
         updateFireworks();
         drawFireworks();
-        if (fireworks.length > 0) {
-            requestAnimationFrame(animate);
-        } else {
-            canvas.style.display = 'none';
-        }
+        requestAnimationFrame(animate);
     }
 
     canvas.style.display = 'block';
-    createFirework(Math.random() * canvas.width, Math.random() * canvas.height);
-    createFirework(Math.random() * canvas.width, Math.random() * canvas.height);
-    createFirework(Math.random() * canvas.width, Math.random() * canvas.height);
+    setInterval(() => {
+        createFirework(Math.random() * canvas.width, Math.random() * canvas.height);
+    }, 1000); // Create a new firework every second
+
     animate();
 }
+
+// Add this function to handle the rain animation
+function startRain() {
+    const canvas = document.getElementById('rainCanvas');
+    const ctx = canvas.getContext('2d');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    const drops = [];
+
+    function createDrop() {
+        const x = Math.random() * canvas.width;
+        const y = Math.random() * canvas.height;
+        const speed = Math.random() * 5 + 2;
+        const length = Math.random() * 20 + 10;
+        drops.push({ x, y, speed, length });
+    }
+
+    function updateRain() {
+        for (let i = 0; i < drops.length; i++) {
+            const drop = drops[i];
+            drop.y += drop.speed;
+            if (drop.y > canvas.height) {
+                drop.y = -drop.length;
+                drop.x = Math.random() * canvas.width;
+            }
+        }
+    }
+
+    function drawRain() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.strokeStyle = 'rgba(174,194,224,0.5)';
+        ctx.lineWidth = 1;
+        ctx.lineCap = 'round';
+        for (const drop of drops) {
+            ctx.beginPath();
+            ctx.moveTo(drop.x, drop.y);
+            ctx.lineTo(drop.x, drop.y + drop.length);
+            ctx.stroke();
+        }
+    }
+
+    function animateRain() {
+        updateRain();
+        drawRain();
+        requestAnimationFrame(animateRain);
+    }
+
+    for (let i = 0; i < 500; i++) {
+        createDrop();
+    }
+    animateRain();
+}
+
+// Modify the 'game_end' event handler to start the rain animation for the losing player
+socket.on('game_end', (result) => {
+    console.log(result);
+    document.querySelector('#game-result').innerText = result;
+    document.querySelector('#waiting-message').innerText = ''; // Clear waiting message
+    document.querySelector('#replay').style.display = 'block';
+    if (result === 'Gagné') {
+        launchFireworks();
+    } else {
+        startRain();
+    }
+    displayFinalScoreBoard();
+});
+

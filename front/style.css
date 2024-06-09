@@ -1,6 +1,7 @@
 body {
     font-family: Arial, sans-serif;
-    background-color: #f4f4f9;
+    background-color: #121212;
+    color: #e0e0e0;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -11,9 +12,9 @@ body {
 .container {
     width: 80%;
     max-width: 600px;
-    background: #fff;
+    background: #1e1e1e;
     padding: 30px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
     border-radius: 8px;
     display: flex;
     flex-direction: column;
@@ -30,6 +31,7 @@ body {
 h1 {
     margin: 0;
     margin-bottom: 20px;
+    color: #ffffff;
 }
 
 .players {
@@ -56,8 +58,10 @@ textarea, input[type="text"] {
     width: 80%;
     padding: 10px;
     margin-bottom: 20px;
-    border: 1px solid #ccc;
+    border: 1px solid #424242;
     border-radius: 4px;
+    background-color: #2e2e2e;
+    color: #e0e0e0;
 }
 
 button {
@@ -75,6 +79,27 @@ button:hover {
     background-color: #0056b3;
 }
 
+.rounds-selection {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+.rounds-selection label {
+    margin-right: 10px;
+}
+
+.rounds-selection select {
+    padding: 10px;
+    border: 1px solid #424242;
+    border-radius: 4px;
+    background-color: #2e2e2e;
+    color: #e0e0e0;
+    font-size: 16px;
+    cursor: pointer;
+}
+
 .score-board {
     font-size: 24px;
     margin-bottom: 30px;
@@ -90,11 +115,12 @@ button:hover {
     padding: 20px;
     border: 2px solid #007bff;
     border-radius: 8px;
-    background-color: white;
+    background-color: #1e1e1e;
     font-size: 18px;
     cursor: pointer;
     transition: background-color 0.3s, color 0.3s;
     margin: 0 15px;
+    color: #e0e0e0;
 }
 
 .rps-button:hover {
@@ -115,4 +141,43 @@ button:hover {
     height: 100%;
     pointer-events: none;
     z-index: 1000;
+}
+
+#rainCanvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 1000;
+}
+
+.final-score-container {
+    width: 100%;
+    background: #282828;
+    padding: 20px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    border-radius: 8px;
+    text-align: center;
+    margin-top: 20px;
+}
+
+.final-score-board {
+    color: #ffffff;
+}
+
+.final-score-board h2 {
+    margin-bottom: 20px;
+}
+
+.final-score-board p {
+    margin: 5px 0;
+}
+
+#replay {
+    display: block;
+    margin: 20px auto; /* Centrer le bouton et ajouter un espace autour */
+    padding: 15px 30px; /* Rendre le bouton plus grand */
+    font-size: 18px; /* Augmenter la taille du texte */
 }

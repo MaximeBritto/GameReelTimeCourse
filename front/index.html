@@ -9,7 +9,7 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>Pierre, Papier, Ciseaux</h1>
+            <h1>Rock, Paper, Scissors</h1>
             <div class="players">
                 <div id="player1" class="player">
                     <span id="player1-name">Player 1</span>
@@ -27,6 +27,14 @@
             <textarea id="room"></textarea>
             <p>Pseudo</p>
             <textarea id="pseudo"></textarea>
+            <div class="rounds-selection">
+                <label for="roundsToWin">Number of Rounds to Win</label>
+                <select id="roundsToWin">
+                    <option value="1">1</option>
+                    <option value="3" selected>3</option>
+                    <option value="5">5</option>
+                </select>
+            </div>
             <button id="joinButton" onclick="joinRoom()">Join Room</button>
             <button id="leaveButton" onclick="leaveRoom()" style="display:none;">Leave Room</button>
         </div>
@@ -41,8 +49,12 @@
             <p id="game-result" class="game-result"></p>
             <button id="replay" onclick="replay()" style="display:none;">Replay</button>
         </div>
+        <div id="final-score-container" class="final-score-container" style="display:none;">
+            <div id="final-score-board" class="final-score-board"></div>
+        </div>
     </div>
     <canvas id="fireworksCanvas"></canvas>
+    <canvas id="rainCanvas"></canvas>
     <script src="https://cdn.socket.io/4.7.5/socket.io.min.js" integrity="sha384-2huaZvOR9iDzHqslqwpR87isEmrfxqyWOF7hr7BY6KG0+hVKLoEXMPUJw3ynWuhO" crossorigin="anonymous"></script>
     <script src="script.js"></script>
 </body>

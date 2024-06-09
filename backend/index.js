@@ -29,6 +29,7 @@ let rooms = {};
 let players = {};
 let scores = {};
 let pseudos = {};
+let roundsToWin = {};
 
 app.get('/', (req, res) => {
     res.json('ip address: http://' + ip.address() + ':' + PORT);    
@@ -43,7 +44,7 @@ io.on('connection', (socket) => {
         handlePlayerLeave(socket);
     });
 
-    socket.on('join', (room, pseudo) => {
+    socket.on('join', (room, pseudo, rounds) => {
         console.log(`${pseudo} joined room: ${room}`);
         socket.join(room);
 
@@ -59,6 +60,8 @@ io.on('connection', (socket) => {
         if (!pseudos[room]) {
             pseudos[room] = {};
         }
+        roundsToWin[room] = rounds;
+
         scores[room][socket.id] = 0;
         pseudos[room][socket.id] = pseudo;
 
@@ -108,11 +111,11 @@ io.on('connection', (socket) => {
                 players[room][player1] = null;
                 players[room][player2] = null;
 
-                if (scores[room][player1] === 2) {
+                if (scores[room][player1] === roundsToWin[room]) {
                     io.to(player1).emit('game_end', 'Gagné');
                     io.to(player2).emit('game_end', 'Perdu');
                     resetGame(room, false); // Reset game without resetting pseudos
-                } else if (scores[room][player2] === 2) {
+                } else if (scores[room][player2] === roundsToWin[room]) {
                     io.to(player2).emit('game_end', 'Gagné');
                     io.to(player1).emit('game_end', 'Perdu');
                     resetGame(room, false); // Reset game without resetting pseudos
@@ -126,7 +129,8 @@ io.on('connection', (socket) => {
         }
     });
 
-    socket.on('reset_game', (room) => {
+    socket.on('reset_game', (room, rounds) => {
+        roundsToWin[room] = rounds; // Set the new rounds to win
         resetGame(room, true); // Reset game and reset scores
         io.to(room).emit('start_game', pseudos[room]);
     });
